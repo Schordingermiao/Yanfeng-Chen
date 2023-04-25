@@ -1,0 +1,152 @@
+ass1-k8s 密码jycshigesb
+
+
+-A INPUT -p tcp -m state --state NEW -m tcp --dport 6443 -j ACCEPT
+-A INPUT -p tcp -m state --state NEW --match multiport --dport 10250,10257,10259 -j ACCEPT
+-A INPUT -p tcp -m state --state NEW -m tcp --dport 30000:32767 -j ACCEPT
+-A INPUT -p tcp -m state --state NEW -m tcp --dport 6783 -j ACCEPT
+-A INPUT -p udp -m state --state NEW  --match multiport --dport 6783,6784 -j ACCEPT
+
+
+
+
+
+
+
+
+
+
+安装python3.11
+
+https://iohk.zendesk.com/hc/en-us/articles/16724475448473-Install-Python-3-11-on-ubuntu
+
+
+
+152.69.187.178
+10.0.0.188
+
+删除软连接
+sudo mv /usr/bin/python /usr/bin/python.bak
+建立python3.11 软连接
+sudo ln -s /usr/bin/python3.11 /usr/bin/python
+
+
+sudo apt-get install python-is-python3
+
+
+
+
+安装flask
+ sudo apt-get update && sudo apt-get install -y python3-pip  curl && pip3 install flask
+
+
+客户端
+python Cloudiod_client.py  inputfolder/  http://localhost:30001/api/object_detection 4
+python Cloudiod_client.py  inputfolder/  http://152.69.187.178:30001/api/object_detection 4
+
+
+curl -XPOST -d  "aaaaaa" http://localhost:5000/api/object_detection
+模型
+python object_detection.py yolo_tiny_configs/ ../client/inputfolder/000000007454.jpg
+
+
+
+
+
+
+
+布置docker
+ sudo service docker restart
+删除所有docker:
+docker rm -f $(docker ps -a -q) 
+
+
+
+建立docker
+如果build的过程卡住了
+
+sudo service docker restart
+
+
+docker build -t flask-app  .
+docker run -d -p 5000:1024 --name my-flask-app flask-app
+
+
+ docker run -d -p 1024:1024 --name my-flask-app flask-app
+
+
+docker build -t flask-app  .&& docker run -d -p 5000:1024 --name my-flask-app flask-app && docker run -it --rm flask-app
+
+加上bash 可进入docker里的命令行
+ docker run -it --rm flask-app bash
+ 
+curl localhost:5000
+ docker ps -a
+ docker image list
+
+ docker compose up -d
+
+docker rmi flask-app
+
+
+
+布置k8s
+kubectl get nodes
+kubectl get nodes,deployments,pods --namespace=<your-namespace> -o wide
+kubectl get svc --namespace=<your-namespace> -o wide
+
+kubectl delete svc <YourServiceName>
+
+namespace
+kubectl get namespace
+ kubectl create namespace <your-name> 
+
+ kubectl apply -f my-deployment.yml --namespace=<your-namespace>
+
+kubectl logs <pod-name> --namespace=<your-namespace>
+ kubectl apply -f my-service.yml --namespace=<your-namespace>
+
+
+docker hub仓库
+
+docker commit fbe0519afc55 schordingermiao/ass1:0001 && docker push schordingermiao/ass1:0001
+docker push schordingermiao/ass1:0001
+docker pull schordingermiao/ass1:0001
+
+1234是最新版本
+
+
+
+
+
+
+
+
+
+
+kubectl delete --all pods --namespace=ass1
+
+重新部署
+ kubectl scale deployment flask-deployment --replicas=1 --namespace=ass1
+
+ kubectl delete -f my-deployment.yml --namespace=ass1 &&  kubectl delete -f my-service.yml --namespace=ass1 && kubectl apply -f my-deployment.yml --namespace=ass1 && kubectl apply -f my-service.yml --namespace=ass1
+ kubectl delete -f my-service.yml --namespace=ass1
+ kubectl apply -f my-deployment.yml --namespace=ass1 && kubectl apply -f my-service.yml --namespace=ass1
+kubectl apply -f my-service.yml --namespace=ass1
+
+
+
+参考
+https://stackoverflow.com/questions/55313610/importerror-libgl-so-1-cannot-open-shared-object-file-no-such-file-or-directo
+https://stackoverflow.com/questions/27273412/cannot-install-packages-inside-docker-ubuntu-image
+
+https://stackoverflow.com/questions/38002543/apt-get-update-returned-a-non-zero-code-100
+
+https://stackoverflow.com/questions/61567404/docker-temporary-failure-resolving-deb-debian-org
+https://askubuntu.com/questions/1144446/python-installed-in-ubuntu-but-python-command-not-found
+
+
+https://computingforgeeks.com/how-to-install-minikube-on-ubuntu-debian-linux/
+https://medium.com/swlh/how-to-run-locally-built-docker-images-in-kubernetes-b28fbc32cc1d
+https://www.cnblogs.com/JerryMouseLi/p/16040807.html
+https://stackoverflow.com/questions/55021270/error-could-not-find-a-version-that-satisfies-the-requirement-flask-from-versi
